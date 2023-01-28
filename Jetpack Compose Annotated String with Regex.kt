@@ -9,31 +9,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Color
 
+
 @Composable
 fun HighlightedText() {
-    val text = "This is some text with words that will be highlighted in green and bold"
+    val text = "This is some text with words that will be highlighted in different styles"
 
-    val style = SpanStyle(
+    val regexRedItalic = Regex("is|in")
+    val regexGreenBold = Regex("some|with")
+
+    val greenBoldStyle = SpanStyle(
         color = Color.Green,
         fontWeight = FontWeight.Bold
     )
 
-    val wordsToHighlight = listOf("highlighted", "green", "bold")
+    val redItalicStyle = SpanStyle(
+        color = Color.Red,
+        fontStyle = FontStyle.Italic
+    )
 
-    val regex = Regex(wordsToHighlight.joinToString("|"))
+    val regexMap = mapOf(
+        regexRedItalic to redItalicStyle,
+        regexGreenBold to greenBoldStyle
+    )
 
     val annotatedString = annotatedString {
         append(text)
-        regex.findAll(text).forEach {
-            val (start, end) = it.range
-            val word = it.value
-            span(start, end, style) {
-                append(word)
+        regexMap.forEach { (regex, style) ->
+            regex.findAll(text).forEach {
+                val (start, end) = it.range
+                val word = it.value
+                span(start, end, style) {
+                    append(word)
+                }
             }
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column {
         Text(annotatedString)
     }
 }
